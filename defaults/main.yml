@@ -1,13 +1,13 @@
 # defaults file for localectl
 
 # Set your systems language designation
-localectl_locale: en_US.UTF-8
+localectl_locale: en_UK.UTF-8
 
 # Set your systems Keymap designation
-localectl_keymap: us
+localectl_keymap: uk
 
 # Set your systems X11-Layout designation
-localectl_x11_keymap: us
+localectl_x11_keymap: uk
 
 # Whether or not to use the `become` feature of Ansible to gain admin
 # privileges

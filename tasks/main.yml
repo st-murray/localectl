@@ -5,32 +5,40 @@
     src: /etc/locale.conf
   register: host_locale
 
-- name: update locale if needed
+- name: Update locale if needed
   become: "{{ localectl_become }}"
   become_user: "{{ localectl_become_user }}"
-  command: localectl set-locale LANG="{{ localectl_locale}}"
+  command: localectl set-locale LANG="{{ localectl_locale }}"
   when: localectl_locale not in host_locale.content | b64decode
 
+# Grep for KEYMAP= and fail if return code empty
 - name: Find the current keymap setting
-  slurp:
-    src: /etc/vconsole.conf
-  register: host_keymap
+  become: "{{ localectl_become }}"
+  become_user: "{{ localectl_become_user }}"
+  shell: grep /etc/vconsole.conf -v -e '^#' | sed -E -e 's/#.*$//' | grep
+    KEYMAP'='
+  register: keymap
+  changed_when: "keymap.rc != false"
 
-- name: update keymap if needed
+- name: Update keymap if needed
   become: "{{ localectl_become }}"
   become_user: "{{ localectl_become_user }}"
   command: >
-    localectl set-keymap --no-convert "{{ localectl_keymap }}"
-  when: localectl_keymap not in host_keymap.content | b64decode
+      localectl set-keymap --no-convert "{{ localectl_keymap }}"
+  when: localectl_keymap not in keymap.stdout
 
 - name: Find the current x11_keymap setting
   slurp:
     src: /etc/X11/xorg.conf.d/00-keyboard.conf
   register: host_x11_keymap
 
-- name: update x11keymap if needed
+- name: Make myx11keymap var
+  set_fact:
+    myx11keymap: 'XkbLayout" "{{ localectl_x11_keymap }}'
+
+- name: Update x11keymap if needed
   become: "{{ localectl_become }}"
   become_user: "{{ localectl_become_user }}"
   command: >
     localectl set-x11-keymap --no-convert "{{ localectl_x11_keymap }}"
-  when: localectl_x11_keymap not in host_x11_keymap.content | b64decode
+  when: myx11keymap not in host_x11_keymap.content | b64decode
