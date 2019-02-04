@@ -1,5 +1,7 @@
 dependency:
   name: galaxy
+  options:
+    role-file: molecule/openstack/playbook.yml
 driver:
   name: openstack
 lint:

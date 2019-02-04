@@ -1,5 +1,4 @@
 # role tasks
-
 - name: Find the current locale setting
   slurp:
     src: /etc/locale.conf
@@ -11,14 +10,16 @@
   command: localectl set-locale LANG="{{ localectl_locale }}"
   when: localectl_locale not in host_locale.content | b64decode
 
-# Grep for KEYMAP= and fail if return code empty
+# Grep vconsole.conf file to ignore comments and
+# exactly match and return the line that includes KEYMAP=
 - name: Find the current keymap setting
   become: "{{ localectl_become }}"
   become_user: "{{ localectl_become_user }}"
-  shell: grep /etc/vconsole.conf -v -e '^#' | sed -E -e 's/#.*$//' | grep
-    KEYMAP'='
+  shell: |
+    set -o pipefail | grep /etc/vconsole.conf -v -e '^#' |
+    sed -E -e 's/#.*$//' | grep KEYMAP'='
   register: keymap
-  changed_when: "keymap.rc != false"
+  changed_when: "keymap.rc != 0"
 
 - name: Update keymap if needed
   become: "{{ localectl_become }}"

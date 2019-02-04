@@ -21,7 +21,7 @@ provisioner:
     name: ansible-lint
   playbooks:
     prepare: ../shared/prepare.yml
-    converge: playbook.yml
+    converge: ../shared/playbook.yml
 scenario:
   name: docker
 verifier:
@@ -32,8 +32,3 @@ verifier:
     v: true
   lint:
     name: flake8
-    # Using the shared directory is useful for sharing tests across scenarios,
-    # but is not a requirement. For scenario specific tests, add the appropriate
-    # file path to the test or test directory below
-    # additional_files_or_dirs:
-    # directory: ../shared/tests

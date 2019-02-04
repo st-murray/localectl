@@ -2,4 +2,8 @@
   hosts: all
   roles:
     - role: localectl
+      vars:
+        localectl_locale: en_UK.UTF-8
+        localectl_keymap: uk
+        localectl_x11_keymap: uk
   post_tasks: []
